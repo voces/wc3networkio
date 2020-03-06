@@ -1,0 +1,42 @@
+{
+  "name": "wc3networkio",
+  "version": "1.0.0",
+  "description": "Proxy for WC3 map network requests",
+  "main": "dist/src/index.js",
+  "module": "dist/src/index.js",
+  "dependencies": {
+    "node-fetch": "^2.6.0",
+    "node-watch": "^0.6.3"
+  },
+  "devDependencies": {
+	"@types/node-fetch": "^2.5.5",
+    "@babel/preset-env": "^7.8.4",
+    "@types/jest": "^25.1.2",
+    "@types/node": "^13.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "@typescript-eslint/parser": "^2.19.0",
+    "@zerollup/ts-transform-paths": "^1.7.11",
+    "babel-eslint": "^10.0.3",
+    "eslint-config-mdcs": "^4.2.3",
+    "eslint-config-verit": "^1.0.3",
+    "eslint": "^6.7.1",
+    "jest": "^25.1.0",
+    "typescript": "^3.7.5",
+    "ts-jest": "^25.2.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "debug": "node --experimental-modules --no-warnings --inspect-brk dist/index.js",
+    "start-debug": "node --inspect-brk --experimental-modules --no-warnings dist/index.js",
+    "start": "node --experimental-modules --no-warnings dist/index.js",
+    "test-debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "test": "jest"
+  },
+  "author": "verit",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=13.0.1"
+  }
+}

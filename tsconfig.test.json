@@ -1,0 +1,29 @@
+{
+	"compilerOptions": {
+		"outDir": ".",
+		"baseUrl": "src",
+		"allowJs": false,
+		"target": "es6",
+		"lib": [ "es2020" ],
+		"moduleResolution": "node",
+		"strict": true,
+		"noImplicitAny": true,
+		"noImplicitThis": true,
+		"alwaysStrict": true,
+		"strictNullChecks": true,
+		"paths": {
+			"*": [
+				"../node_modules/*/src/index",
+				"../node_modules/*/lib/index",
+				"../node_modules/*/index",
+				"../node_modules/*/dist/index"
+			]
+		},
+		"types": [
+            "@types/jest",
+            "@types/node"
+		]
+	},
+	"include": ["src"],
+	"exclude": []
+}
