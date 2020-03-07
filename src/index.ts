@@ -19,19 +19,29 @@ const abilities = [
 	1097228907,
 ];
 
-const watchPath = `${os.homedir()}/Documents/Warcraft III/CustomMapData/networkio/requests`;
+const watchPath = path.join( os.homedir(), "Documents", "Warcraft III", "CustomMapData", "networkio", "requests" );
 console.log( new Date(), "watching", watchPath );
 watch( watchPath, async ( event, filename ) => {
 
 	if ( event !== "update" ) return;
 
-	console.log( new Date(), "received request", filename );
-
 	const contents = await fs.readFile( filename, { encoding: "utf-8" } );
+	const responseFilename = filename.replace( "requests", "responses" );
 	const start = contents.indexOf( "\"" ) + 1;
 	const end = contents.lastIndexOf( "\"" );
 	const json = contents.slice( start, end );
 	const request = JSON.parse( json );
+
+	if ( request === "clear" ) {
+
+		console.log( new Date(), "clearing request", filename );
+		fs.unlink( filename );
+		Promise.all( Array( 10 ).fill( 0 ).map( ( _, i ) => fs.unlink( responseFilename.replace( ".txt", `-${i}.txt` ) ) ) );
+		return;
+
+	}
+
+	console.log( new Date(), "received request", filename );
 
 	let response = ( await fetch( request.url, {
 		method: request.method ?? ( request.body ? "POST" : "GET" ),
@@ -47,25 +57,26 @@ watch( watchPath, async ( event, filename ) => {
 
 	try {
 
-		let content = "function PreloadFiles takes nothing returns nothing\n\ncall PreloadStart()\ncall Preload(\"";
+		const responseFilename = filename.replace( "requests", "responses" );
+		console.log( new Date(), "writing response", responseFilename, response );
+
+		let content = "function PreloadFiles takes nothing returns nothing";
 
 		for ( let abilityIndex = 0, responseIndex = 0; responseIndex < response.length; abilityIndex ++, responseIndex += preloadLimit ) {
 
 			const chunk = response.slice( responseIndex, responseIndex + preloadLimit );
-			content += `")\ncall BlzSetAbilityIcon(${abilities[ abilityIndex ]}, "-${chunk}")\n`;
+			content += `\n\tcall BlzSetAbilityIcon(${abilities[ abilityIndex ]}, "-${chunk}")`;
 
 		}
 
-		content += "call PreloadEnd(0.0)\nendfunction";
+		content += "\nendfunction";
 
-		const responseFilename = filename.replace( "requests", "responses" );
 		await fs.mkdir( path.dirname( responseFilename ), { recursive: true } );
-		fs.writeFile( responseFilename, content );
-		console.log( new Date(), "writing response", responseFilename );
+		await Promise.all( Array( 10 ).fill( 0 ).map( ( _, i ) => fs.writeFile( responseFilename.replace( ".txt", `-${i}.txt` ), content ) ) );
 
 	} catch ( err ) {
 
-		console.log( err );
+		console.error( new Date(), err );
 
 	}
 
