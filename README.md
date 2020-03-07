@@ -5,10 +5,10 @@ networkio is a protocol for WC3 maps to make network requests with aid of a prox
 networkio works by having the map write requests to a directory monitored by a
 proxy service. When the proxy detects a file being created or updated, the
 proxy will parse the contents (JSON), create a request, then write the response
-body (no headers) to multiple files. The map, in the meantime, will poll for
-these files, and when the map detects one, it will load in the contents. Once
-done, the map will modify the original request file in order to have the proxy
-delete the request file and the response files.
+body (no headers) to multiple files. The map, in the meantime, will poll
+responses in the form of files, and, when the map detects a response file, will
+load the file contents. Once loaded, the map will modify the original request
+file in order to have the proxy delete the request file and the response files.
 
 ## Proxy
 The proxy's job is to monitor for requests, make requests, write responses, and
@@ -44,11 +44,11 @@ requests to be handled by the proxy itself. Otherwise, the proxy should perform
 actual network requests. More on special requests later.
 
 ### Writing a response
-Once the proxy has the response content, it should write the response to disk
-to be consumed by the map. The responses will be written to the request file's
-path, replacing `requests` with `responses`. Further, because WC3 maps can
-only preload a single path once, the proxy will write ten files, each with a
-numeric tag, ranging from 0 to 9. This tag comes at the end of the filename
+Once the proxy has the response content, the proxy should write the response to
+disk to be consumed by the map. The responses will be written to the request
+file's path, replacing `requests` with `responses`. Further, because WC3 maps
+can only preload a single path once, the proxy will write ten files, each with
+a numeric tag, ranging from 0 to 9. This tag comes at the end of the filename
 before the file extension.
 
 Example:
