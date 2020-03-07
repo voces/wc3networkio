@@ -21,6 +21,20 @@ const abilities = [
 
 const watchPath = path.join( os.homedir(), "Documents", "Warcraft III", "CustomMapData", "networkio", "requests" );
 console.log( new Date(), "watching", watchPath );
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const makeRequest = async ( request: any ): Promise<string> => {
+
+	if ( request.url === "proxy://version" )
+		return "1";
+
+	return ( await fetch( request.url, {
+		method: request.method ?? ( request.body ? "POST" : "GET" ),
+		body: request.body,
+	} ).then( r => r.text() ) ).replace( /"/g, "\\\"" );
+
+};
+
 watch( watchPath, async ( event, filename ) => {
 
 	if ( event !== "update" ) return;
@@ -32,7 +46,7 @@ watch( watchPath, async ( event, filename ) => {
 	const json = contents.slice( start, end );
 	const request = JSON.parse( json );
 
-	if ( request === "clear" ) {
+	if ( request.url === "proxy://clear" ) {
 
 		console.log( new Date(), "clearing request", filename );
 		fs.unlink( filename );
@@ -43,10 +57,7 @@ watch( watchPath, async ( event, filename ) => {
 
 	console.log( new Date(), "received request", filename );
 
-	let response = ( await fetch( request.url, {
-		method: request.method ?? ( request.body ? "POST" : "GET" ),
-		body: request.body,
-	} ).then( r => r.text() ) ).replace( /"/g, "\\\"" );
+	let response = await makeRequest( request );
 
 	if ( response.length > preloadLimit * abilities.length ) {
 
