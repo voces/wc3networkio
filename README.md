@@ -71,7 +71,7 @@ with the same loading mechanism as
 will be chunked into 200-character blocks, wrapped in `BlzSetAbilityIcon`
 calls. Here is an example:
 ```
-function PreloadFile takes nothing returns nothing
+function PreloadFiles takes nothing returns nothing
         call BlzSetAbilityIcon(1097690227, "-{\"status\":\"OK\",\"code\":200,\"queryTime\":0.0028,\"body\":[{\"name\":\"f\",\"server\":\"usw\",\"map\":\"Custom_Castle_Defense_v7.17.0p.w3x\",\"host\":\"Daks#1452\",\"details\":null,\"slotsTaken\":")
         call BlzSetAbilityIcon(1098018659, "-2,\"slotsTotal\":12,\"created\":1583607854,\"checksum\":\"\",\"lastUpdated\":1583607888,\"id\":52389}]}")
 endfunction
