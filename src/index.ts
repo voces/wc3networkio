@@ -26,50 +26,62 @@ console.log( new Date(), "watching", watchPath );
 const makeRequest = async ( request: any ): Promise<string> => {
 
 	if ( request.url === "proxy://version" )
-		return "1";
+		return "2";
 
 	return ( await fetch( request.url, {
 		method: request.method ?? ( request.body ? "POST" : "GET" ),
 		body: request.body,
-	} ).then( r => r.text() ) ).replace( /"/g, "\\\"" );
+	} ).then( r => r.text() ) )
+		.replace( /\\/g, "\\\\" )
+		.replace( /\r?\n/g, "\\n" )
+		.replace( /"/g, "\\\"" );
 
 };
 
 watch( watchPath, async ( event, filename ) => {
 
-	if ( event !== "update" ) return;
-
-	const contents = await fs.readFile( filename, { encoding: "utf-8" } );
-	const responseFilename = filename.replace( "requests", "responses" );
-	const start = contents.indexOf( "\"" ) + 1;
-	const end = contents.lastIndexOf( "\"" );
-	const json = contents.slice( start, end );
-	const request = JSON.parse( json );
-
-	if ( request.url === "proxy://clear" ) {
-
-		console.log( new Date(), "clearing request", filename );
-		fs.unlink( filename );
-		Promise.all( Array( 10 ).fill( 0 ).map( ( _, i ) => fs.unlink( responseFilename.replace( ".txt", `-${i}.txt` ) ) ) );
-		return;
-
-	}
-
-	console.log( new Date(), "received request", filename );
-
-	let response = await makeRequest( request );
-
-	if ( response.length > preloadLimit * abilities.length ) {
-
-		console.log( new Date(), `response too large (${response.length}), writing empty value` );
-		response = "";
-
-	}
-
 	try {
 
+		if ( event !== "update" ) return;
+
+		const contents = await fs.readFile( filename, { encoding: "utf-8" } );
 		const responseFilename = filename.replace( "requests", "responses" );
-		console.log( new Date(), "writing response", responseFilename, response );
+		const start = contents.indexOf( "\"" ) + 1;
+		const end = contents.lastIndexOf( "\"" );
+		const json = contents.slice( start, end );
+		const request = JSON.parse( json );
+
+		if ( request.url === "proxy://clear" ) {
+
+			console.log( new Date(), "clearing request", filename );
+			fs.unlink( filename );
+			Promise.all( Array( 10 ).fill( 0 ).map( ( _, i ) => fs.unlink( responseFilename.replace( ".txt", `-${i}.txt` ) ) ) );
+			return;
+
+		}
+
+		console.log( new Date(), "received request", filename );
+		console.log( request );
+
+		let response = await makeRequest( request );
+
+		if ( response.length > preloadLimit * abilities.length ) {
+
+			console.log( new Date(), `response too large (${response.length}), writing empty value` );
+			response = "";
+
+		}
+
+		if ( request.noResponse ) {
+
+			console.log( new Date(), "no response, clearing request", filename );
+			fs.unlink( filename );
+			return;
+
+		}
+
+		console.log( new Date(), "writing response", responseFilename );
+		console.log( response );
 
 		let content = "function PreloadFiles takes nothing returns nothing";
 

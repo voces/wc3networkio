@@ -35,7 +35,8 @@ contents will be valid JSON with the following structure:
 {
 	url: string,
 	headers?: Record<string, string>,
-	body?: string
+	body?: string,
+	noResponse?: boolean,
 }
 ```
 ### Making a request
@@ -50,6 +51,8 @@ file's path, replacing `requests` with `responses`. Further, because WC3 maps
 can only preload a single path once, the proxy will write ten files, each with
 a numeric tag, ranging from 0 to 9. This tag comes at the end of the filename
 before the file extension.
+
+If `noResponse` is `true`, then no response should be written.
 
 Example:
 ```typescript
@@ -109,7 +112,7 @@ a previous game's request.
 #### Version
 When the request `url` is equal to `"proxy://version"`, then the proxy should
 respond with the networkio spec version. The current version of the spec is
-`1`. Note the JSON type should be number, not string.
+`2`. Note the JSON type should be number, not string.
 
 The is used at the beginning of a game to determine which players have the
 proxy and to future-proof compatibility with spec modifications.
