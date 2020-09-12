@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
   "dependencies": {
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "node-watch": "^0.6.3"
   },
   "devDependencies": {
